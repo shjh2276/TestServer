@@ -25,4 +25,15 @@ public class AuthService {
         }
         return username;
     }
+
+    public String signup(String username, String password, String passwordConfirm) {
+        if (!password.equals(passwordConfirm)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        if (USER_STORE.containsKey(username)) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        }
+        USER_STORE.put(username, password);
+        return username;
+    }
 }
