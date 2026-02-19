@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - TestServer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .signup-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 360px;
+    }
+    h1 { font-size: 22px; margin-bottom: 24px; text-align: center; }
+    label { display: block; margin-bottom: 6px; font-size: 14px; color: #333; }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    input.error { border-color: #e53935; }
+    .error-msg {
+      color: #e53935;
+      font-size: 12px;
+      margin-bottom: 12px;
+      min-height: 16px;
+    }
+    .field { margin-bottom: 16px; }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #388e3c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    button:hover { background: #2e7d32; }
+    .global-msg {
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .global-msg.error { background: #fdecea; color: #e53935; border: 1px solid #f5c6cb; }
+    .global-msg.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .login-link { text-align: center; margin-top: 16px; font-size: 13px; color: #666; }
+    .login-link a { color: #1976d2; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="signup-box">
+    <h1>회원가입</h1>
+    <div class="global-msg" id="globalMsg"></div>
+    <div class="field">
+      <label for="username">아이디</label>
+      <input type="text" id="username" placeholder="4~20자 입력">
+      <div class="error-msg" id="usernameError"></div>
+    </div>
+    <div class="field">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" placeholder="4~20자 입력">
+      <div class="error-msg" id="passwordError"></div>
+    </div>
+    <div class="field">
+      <label for="passwordConfirm">비밀번호 확인</label>
+      <input type="password" id="passwordConfirm" placeholder="비밀번호 재입력">
+      <div class="error-msg" id="passwordConfirmError"></div>
+    </div>
+    <button onclick="handleSignup()">가입하기</button>
+    <div class="login-link">이미 계정이 있으신가요? <a href="login.html">로그인</a></div>
+  </div>
+
+  <script>
+    function clearErrors() {
+      ["username", "password", "passwordConfirm"].forEach(id => {
+        document.getElementById(id).classList.remove("error");
+        document.getElementById(id + "Error").textContent = "";
+      });
+      const msg = document.getElementById("globalMsg");
+      msg.style.display = "none";
+      msg.className = "global-msg";
+      msg.textContent = "";
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById("globalMsg");
+      msg.textContent = text;
+      msg.className = "global-msg " + type;
+      msg.style.display = "block";
+    }
+
+    function handleSignup() {
+      clearErrors();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const passwordConfirm = document.getElementById("passwordConfirm").value;
+      let valid = true;
+
+      if (!username) {
+        document.getElementById("usernameError").textContent = "아이디를 입력해주세요.";
+        document.getElementById("username").classList.add("error");
+        valid = false;
+      } else if (username.length < 4 || username.length > 20) {
+        document.getElementById("usernameError").textContent = "아이디는 4~20자 사이여야 합니다.";
+        document.getElementById("username").classList.add("error");
+        valid = false;
+      }
+
+      if (!password) {
+        document.getElementById("passwordError").textContent = "비밀번호를 입력해주세요.";
+        document.getElementById("password").classList.add("error");
+        valid = false;
+      } else if (password.length < 4 || password.length > 20) {
+        document.getElementById("passwordError").textContent = "비밀번호는 4~20자 사이여야 합니다.";
+        document.getElementById("password").classList.add("error");
+        valid = false;
+      }
+
+      if (!passwordConfirm) {
+        document.getElementById("passwordConfirmError").textContent = "비밀번호 확인을 입력해주세요.";
+        document.getElementById("passwordConfirm").classList.add("error");
+        valid = false;
+      } else if (password && password !== passwordConfirm) {
+        document.getElementById("passwordConfirmError").textContent = "비밀번호가 일치하지 않습니다.";
+        document.getElementById("passwordConfirm").classList.add("error");
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, passwordConfirm })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showMessage("회원가입 성공! 로그인 페이지로 이동합니다.", "success");
+            setTimeout(() => { window.location.href = "login.html"; }, 1500);
+          } else {
+            showMessage(data.message, "error");
+          }
+        })
+        .catch(() => showMessage("서버 오류가 발생했습니다.", "error"));
+    }
+  </script>
+</body>
+</html>
