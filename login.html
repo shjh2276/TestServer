@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 - TestServer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 360px;
+    }
+    h1 { font-size: 22px; margin-bottom: 24px; text-align: center; }
+    label { display: block; margin-bottom: 6px; font-size: 14px; color: #333; }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    input.error { border-color: #e53935; }
+    .error-msg {
+      color: #e53935;
+      font-size: 12px;
+      margin-bottom: 12px;
+      min-height: 16px;
+    }
+    .field { margin-bottom: 16px; }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    button:hover { background: #1565c0; }
+    .global-error {
+      background: #fdecea;
+      color: #e53935;
+      border: 1px solid #f5c6cb;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h1>로그인</h1>
+    <div class="global-error" id="globalError"></div>
+    <div class="field">
+      <label for="username">아이디</label>
+      <input type="text" id="username" placeholder="아이디를 입력하세요">
+      <div class="error-msg" id="usernameError"></div>
+    </div>
+    <div class="field">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" placeholder="비밀번호를 입력하세요">
+      <div class="error-msg" id="passwordError"></div>
+    </div>
+    <button onclick="handleLogin()">로그인</button>
+  </div>
+
+  <script>
+    // 테스트용 계정
+    const VALID_USER = { username: "admin", password: "1234" };
+
+    function clearErrors() {
+      document.getElementById("usernameError").textContent = "";
+      document.getElementById("passwordError").textContent = "";
+      document.getElementById("username").classList.remove("error");
+      document.getElementById("password").classList.remove("error");
+      const globalError = document.getElementById("globalError");
+      globalError.style.display = "none";
+      globalError.textContent = "";
+    }
+
+    function showGlobalError(msg) {
+      const globalError = document.getElementById("globalError");
+      globalError.textContent = msg;
+      globalError.style.display = "block";
+    }
+
+    function handleLogin() {
+      clearErrors();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      let valid = true;
+
+      if (!username) {
+        document.getElementById("usernameError").textContent = "아이디를 입력해주세요.";
+        document.getElementById("username").classList.add("error");
+        valid = false;
+      }
+
+      if (!password) {
+        document.getElementById("passwordError").textContent = "비밀번호를 입력해주세요.";
+        document.getElementById("password").classList.add("error");
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      // 아이디 불일치
+      if (username !== VALID_USER.username) {
+        showGlobalError("아이디 또는 비밀번호가 올바르지 않습니다.");
+        return;
+      }
+
+      // 비밀번호 불일치 - fix: 오류 메시지 표시 추가
+      if (password !== VALID_USER.password) {
+        showGlobalError("아이디 또는 비밀번호가 올바르지 않습니다.");
+        document.getElementById("password").classList.add("error");
+        return;
+      }
+
+      alert("로그인 성공!");
+    }
+  </script>
+</body>
+</html>
