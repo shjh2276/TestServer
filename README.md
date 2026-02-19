@@ -12,3 +12,23 @@
 - 사용자 로그인 / 로그아웃
 - 세션 관리
 - 기본 API 엔드포인트 제공
+
+## 브랜치 전략 (GitFlow)
+
+```
+main
+├── develop
+│   ├── feature/{기능명}   # 새 기능 개발
+│   └── fix/{버그명}       # 버그 수정
+├── release/{버전}         # 배포 준비
+└── hotfix/{긴급수정명}    # 긴급 버그 수정
+```
+
+| 브랜치 | 역할 |
+|--------|------|
+| `main` | 배포용 안정 브랜치 |
+| `develop` | 개발 통합 브랜치 |
+| `feature/*` | 기능 개발 (develop에서 분기 → develop으로 머지) |
+| `fix/*` | 버그 수정 (develop에서 분기 → develop으로 머지) |
+| `release/*` | 배포 준비 (develop → main 머지 전 QA) |
+| `hotfix/*` | 긴급 수정 (main에서 분기 → main + develop으로 머지) |
